@@ -8,12 +8,21 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, UsersFilter $filters)
     {
-        $users = User::with('info');
+//        3.
+        $users = User::with('info')->filter($filters)->get();
 
-        $users = (new UsersFilter($users, $request))->apply()->get();
+        if ($request->expectsJson()) {
+            return response()->json($users->toArray());
+        }
 
+//        2.
+        /*$users = User::with('info');
+
+        $users = (new UsersFilter($users, $request))->apply()->get();*/
+
+//        1.
         /*if ($request->has('name')) {
             $users->where('name', 'like', "%$request->name%");
         }

@@ -5,27 +5,8 @@ namespace App;
 
 use http\Env\Request;
 
-class UsersFilter
+class UsersFilter extends QueryFilter
 {
-    protected $builder;
-    protected $request;
-
-    public function __construct($builder, $request)
-    {
-        $this->builder = $builder;
-        $this->request = $request;
-    }
-
-    public function apply()
-    {
-        foreach ($this->filters() as $filter => $value) {
-            if (method_exists($this, $filter)) {
-                $this->$filter($value);
-            }
-        }
-        return $this->builder;
-    }
-
     public function name($value)
     {
         $this->builder->where('name', 'like', "%$value%");
@@ -33,7 +14,10 @@ class UsersFilter
 
     public function is_active($value)
     {
-        $this->builder->where('is_active', $value);
+        if ($value == true)
+            $this->builder->where('is_active', true);
+        else
+            $this->builder->where('is_active', false);
     }
 
     public function birthday($value)
@@ -49,10 +33,5 @@ class UsersFilter
     public function gender($value)
     {
         $this->builder->where('gender', $value );
-    }
-
-    public function filters()
-    {
-        return $this->request->all();
     }
 }
